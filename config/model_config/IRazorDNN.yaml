@@ -1,0 +1,8 @@
+model_name: "IRazorDNN"
+
+emb_type: "normal"  # "normal"
+regions_dims: [0, 1, 2, 4, 8]
+temperature: 0.5
+
+mlp_dims: [1024, 512, 256, 128]
+dropout: 0.0

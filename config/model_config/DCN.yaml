@@ -1,0 +1,22 @@
+model_name: "DCN"
+
+emb_type: "normal"  # ["normal", "quant"]
+emb_dim: 64
+
+quant_config:
+  quant_method: "uniform"
+  weight_bits: 8
+  layerwise: True
+  learnable: True
+  symmetric: True
+  clip_val: 2.5
+# quant_method,    weight_bits,   layerwise,    learnable(clip_val),  symmetric
+#    "bwn",           1,          True/False 
+#    "twn",           2,          True/False
+#  "uniform",        >=2,         True/False,     True/False,         True/False,
+#    "lsq",          >=2,         True/False,        True,            True/False
+#    "laq",          >=1,         True/False
+
+mlp_dims: [1024, 512, 256, 128]
+dropout: 0.0
+num_cross: 3

@@ -1,0 +1,4 @@
+l2_sparse: 0.00005
+l2_dense: 0.00005
+opt_name: "adam"  # ["sgd", "adam", "rmsprop"]
+lr: 0.0005

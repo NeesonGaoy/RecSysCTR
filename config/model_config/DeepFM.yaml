@@ -1,0 +1,14 @@
+model_name: "DeepFM"
+
+emb_type: "normal"  # ["normal", "quant"]
+emb_dim: 64
+quant_config:
+  quant_method: "uniform"
+  weight_bits: 8
+  layerwise: True
+  learnable: True
+  symmetric: True
+  clip_val: 2.5
+
+mlp_dims: [1024, 512, 256, 128]
+dropout: 0.0

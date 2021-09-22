@@ -2,7 +2,7 @@
 Author: sysu.gaoyong
 Email: ygaoneeson@gmail.com
 Date: 2021-09-22 09:23:31
-LastEditTime: 2021-09-22 09:51:31
+LastEditTime: 2021-09-22 17:43:46
 LastEditors: sysu.gaoyong
 FilePath: /RecSysCTR/models/DeepFM.py
 Copyright (c) 2011 Neeson.GaoYong All rights reserved.
@@ -12,7 +12,7 @@ Copyright (c) 2011 Neeson.GaoYong All rights reserved.
 import torch 
 
 from layers.core import CrossNet, MLP
-from utils_quant import QuantizeEmbedding
+from layers.utils_quant import QuantizeEmbedding
 
 class DeepFM(torch.nn.Module):
     def __init__(self, field_num, id_vocab_size, emb_dim, 

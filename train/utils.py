@@ -2,7 +2,7 @@
 Author: sysu.gaoyong
 Email: ygaoneeson@gmail.com
 Date: 2021-09-22 11:31:01
-LastEditTime: 2021-09-22 11:33:05
+LastEditTime: 2021-09-22 17:54:09
 LastEditors: sysu.gaoyong
 FilePath: /RecSysCTR/train/utils.py
 Copyright (c) 2011 Neeson.GaoYong All rights reserved.
@@ -11,6 +11,8 @@ Copyright (c) 2011 Neeson.GaoYong All rights reserved.
 
 import os
 import sys
+import yaml
+import json
 import logging
 
 import torch
@@ -46,8 +48,14 @@ class LoggerHelper():
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
 
+def load_config(config_file_path):
+    with open(config_file_path, 'r') as stream:
+        config = yaml.safe_load(stream)
+    return config
+
+
 def get_model(model_name, data_config, model_config):
-    if model_name == "deepfm":
+    if model_name == "DeepFM":
         model = DeepFM(field_num=data_config["field_num"], 
                        id_vocab_size=data_config["id_vocab_size"], 
                        emb_dim=model_config["emb_dim"], 
@@ -55,7 +63,7 @@ def get_model(model_name, data_config, model_config):
                        mlp_dims=model_config["mlp_dims"], 
                        dropout=model_config["dropout"], 
                        quant_config=model_config["quant_config"])
-    elif model_name == "dcn":
+    elif model_name == "DCN":
         model = DCN(field_num=data_config["field_num"], 
                     id_vocab_size=data_config["id_vocab_size"], 
                     emb_dim=model_config["emb_dim"], 

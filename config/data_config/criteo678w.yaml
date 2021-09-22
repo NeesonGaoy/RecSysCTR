@@ -1,0 +1,9 @@
+data_name: "criteo678w"
+data_path: "/Users/gaoyong/Desktop/low_bit_quantilizer_training/process_criteo/criteo_tfreocd_threshold1/"
+id_vocab_size: 6780383
+field_num: 39
+field_feat_nums: [57, 107, 127, 49, 224, 138, 94, 80, 100, 10, 
+                  31, 52, 83, 1461, 570, 1545893, 668222, 306, 25, 12399, 
+                  634, 4, 74829, 5557, 1518204, 3195, 28, 13883, 1231447, 11, 
+                  5310, 2151, 5, 1437678, 19, 16, 157463, 104, 99817]
+train_size: 350000

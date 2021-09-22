@@ -2,7 +2,7 @@
 Author: sysu.gaoyong
 Email: ygaoneeson@gmail.com
 Date: 2021-09-22 09:21:53
-LastEditTime: 2021-09-22 09:51:09
+LastEditTime: 2021-09-22 17:43:35
 LastEditors: sysu.gaoyong
 FilePath: /RecSysCTR/models/DCN.py
 Copyright (c) 2011 Neeson.GaoYong All rights reserved.
@@ -12,7 +12,7 @@ Copyright (c) 2011 Neeson.GaoYong All rights reserved.
 import torch
 
 from layers.core import CrossNet, MLP
-from utils_quant import QuantizeEmbedding
+from layers.utils_quant import QuantizeEmbedding
 
 
 class DCN(torch.nn.Module):

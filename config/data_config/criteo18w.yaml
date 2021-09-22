@@ -1,0 +1,9 @@
+data_name: "criteo18w"
+data_path: "/Users/gaoyong/Desktop/low_bit_quantilizer_training/process_criteo/criteo_tfreocd_threshold100/"
+id_vocab_size: 187135
+field_num: 39
+field_feat_nums: [40, 93, 115, 32, 213, 96, 73, 47, 85, 7, 
+                    27, 32, 43, 700, 539, 21054, 23838, 181, 14, 10102, 
+                    350, 3, 16432, 4495, 21497, 3102, 26, 6966, 22553, 10, 
+                    3275, 1612, 4, 21967, 13, 14, 15130, 60, 12295]
+train_size: 400000

@@ -2,7 +2,7 @@
 Author: sysu.gaoyong
 Email: ygaoneeson@gmail.com
 Date: 2021-09-22 11:49:02
-LastEditTime: 2021-09-22 11:51:02
+LastEditTime: 2021-09-22 17:45:50
 LastEditors: sysu.gaoyong
 FilePath: /RecSysCTR/dataloader/__init__.py
 Copyright (c) 2011 Neeson.GaoYong All rights reserved.
@@ -17,7 +17,7 @@ from threading import Thread
 from queue import Queue
 from tqdm import tqdm
 
-
+from dataloader.CriteoLoader import CriteoData
 
 class Thread_Killer(object):
     def __init__(self):

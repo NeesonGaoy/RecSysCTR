@@ -2,15 +2,19 @@
 Author: sysu.gaoyong
 Email: ygaoneeson@gmail.com
 Date: 2021-09-22 11:18:09
-LastEditTime: 2021-09-22 11:29:56
+LastEditTime: 2021-09-22 17:55:23
 LastEditors: sysu.gaoyong
-FilePath: /RecSysCTR/trainer.py
+FilePath: /RecSysCTR/train/trainer.py
 Copyright (c) 2011 Neeson.GaoYong All rights reserved.
 '''
 # coding:utf-8
 import os
+import json
+
 import numpy as np
 import torch
+from train.utils import get_model, get_optimizer, get_log
+
 
 def get_metric(labels, probs, sig_num=4):
     auc = roc_auc_score(labels, probs)
@@ -33,7 +37,7 @@ class Trainer(object):
     def __init__(self, data_loader,
                        data_config, 
                        model_config, 
-                       training_config,
+                       train_config,
                        use_cuda=False):
         """
         data_config: {
@@ -58,7 +62,7 @@ class Trainer(object):
                 "clip_val": ,
             },
         }
-        training_config: {
+        train_config: {
             "batch_size": ,
             "print_steps": , 
             "eval_steps": ,
@@ -87,12 +91,12 @@ class Trainer(object):
 
         self.data_config = data_config
         self.model_config = model_config
-        self.training_config = training_config
+        self.train_config = train_config
         self.use_cuda = use_cuda
 
-        self.print_steps = training_config["print_steps"]
-        self.eval_steps = training_config["eval_steps"]
-        self.early_stop_steps = training_config["early_stop_steps"]
+        self.print_steps = train_config["print_steps"]
+        self.eval_steps = train_config["eval_steps"]
+        self.early_stop_steps = train_config["early_stop_steps"]
 
         self.init_model_args()
         self.load_pretrain()
@@ -102,28 +106,30 @@ class Trainer(object):
                                self.data_config, 
                                self.model_config)
         self.optimizer = get_optimizer(self.model, 
-                                       self.training_config)
+                                       self.train_config)
         
         # self.criterion = torch.nn.BCELoss(reduction='mean')
         self.criterion = torch.nn.functional.binary_cross_entropy_with_logits
 
-        self.logger = get_log(self.training_config["log_path"], self.training_config["log_name"])
+        self.logger = get_log(self.train_config["log_path"], self.train_config["log_name"])
         # self.logger.info("data_config: {} ".format(self.data_config))
         # self.logger.info("model_config: {} ".format(self.model_config))
-        # self.logger.info("training_config: {} ".format(self.training_config))
+        # self.logger.info("train_config: {} ".format(self.train_config))
 
         self.logger.info("data_config: {} ".format(json.dumps(self.data_config, indent=2) ))
         self.logger.info("model_config: {} ".format(json.dumps(self.model_config, indent=2) ))
-        self.logger.info("training_config: {} ".format(json.dumps(self.training_config, indent=2) ))
-
-        self.save_model_path = os.path.join(self.training_config["log_path"], self.training_config["log_name"])
+        self.logger.info("train_config: {} ".format(json.dumps(self.train_config, indent=2) ))
+        
+        self.save_model_path = os.path.join(self.train_config["log_path"], self.train_config["log_name"])
         os.makedirs(self.save_model_path, exist_ok=True)
         self.save_model_name = "saved_step{}_model.pt"
 
+        self.batch_size = self.train_config["batch_size"]
+
     def load_pretrain(self):
-        if self.training_config["load_pretrain"]:
-            pretrain_model_path = os.path.join(self.training_config["pretrain_path"], 
-                                               self.training_config["pretrain_model_name"])
+        if self.train_config["load_pretrain"]:
+            pretrain_model_path = os.path.join(self.train_config["pretrain_path"], 
+                                               self.train_config["pretrain_model_name"])
             pretrain_dict = torch.load(pretrain_model_path)
             model_dict = self.model.state_dict()
             pretrain_dict = {k: v for k,v in pretrain_dict.items() if k in model_dict}
@@ -147,7 +153,7 @@ class Trainer(object):
     def __evaluate(self, data_type, eval_batch_num=None, save_pred=False):
         self.model.eval()
         prob_list, label_list = [], []
-        test_data_iter = self.data_loader.get_data(data_type, batch_size=self.training_config["batch_size"], epoch=1)
+        test_data_iter = self.data_loader.get_data(data_type, batch_size=self.batch_size, epoch=1)
         for step,inputs in test_data_iter:
             if self.use_cuda:
                 inputs = {k : v.cuda() for k,v in inputs.items()}
@@ -176,7 +182,7 @@ class Trainer(object):
         stop_flag = False
         step = 1
         for epoch in range(1, max_epoch+1, 1):
-            train_data_iter = self.data_loader.get_data("train", batch_size=self.training_config["batch_size"], epoch=1)
+            train_data_iter = self.data_loader.get_data("train", batch_size=self.batch_size, epoch=1)
             for i,inputs in train_data_iter:
                 step += 1
                 loss = self.__update(inputs)
@@ -204,8 +210,9 @@ class Trainer(object):
 
 class Trainer_Distillation(object):
     def __init__(self, data_loader,
-                       data_config, model_config, 
-                       training_config,
+                       data_config, 
+                       model_config, 
+                       train_config,
                        use_cuda=False):
         """
         data_config: {
@@ -230,7 +237,7 @@ class Trainer_Distillation(object):
                 "clip_val": ,
             },
         }
-        training_config: {
+        train_config: {
             "batch_size": ,
             "print_steps": , 
             "eval_steps": ,
@@ -259,14 +266,14 @@ class Trainer_Distillation(object):
 
         self.data_config = data_config
         self.model_config = model_config
-        self.training_config = training_config
+        self.train_config = train_config
         self.use_cuda = use_cuda
         # 
-        self.print_steps = training_config["print_steps"]
-        self.eval_steps = training_config["eval_steps"]
-        self.early_stop_steps = training_config["early_stop_steps"]
+        self.print_steps = train_config["print_steps"]
+        self.eval_steps = train_config["eval_steps"]
+        self.early_stop_steps = train_config["early_stop_steps"]
         # 
-        self.mse_coef = self.training_config["mse_coef"]
+        self.mse_coef = self.train_config["mse_coef"]
 
         self.init_model_args()
         self.load_pretrain()
@@ -289,17 +296,20 @@ class Trainer_Distillation(object):
 
         self.mse_loss  = torch.nn.MSELoss(reduction=True)
 
-        self.logger = get_log(self.training_config["log_path"], self.training_config["log_name"])
+        self.logger = get_log(self.train_config["log_path"], self.train_config["log_name"])
 
-        self.save_model_path = os.path.join(self.training_config["log_path"], self.training_config["log_name"])
+        self.save_model_path = os.path.join(self.train_config["log_path"], self.train_config["log_name"])
         os.makedirs(self.save_model_path, exist_ok=True)
         self.save_t_model_name = "saved_step{}_teacher_model.pt"
         self.save_s_model_name = "saved_step{}_student_model.pt"
-    
+
+        self.batch_size = self.train_config["batch_size"]
+
+
     def load_pretrain(self):
-        if self.training_config["load_pretrain"]:
-            pretrain_model_path = os.path.join(self.training_config["pretrain_path"], 
-                                               self.training_config["pretrain_model_name"])
+        if self.train_config["load_pretrain"]:
+            pretrain_model_path = os.path.join(self.train_config["pretrain_path"], 
+                                               self.train_config["pretrain_model_name"])
             pretrain_dict = torch.load(pretrain_model_path)
 
             t_model_dict = self.teacher_model.state_dict()
@@ -329,7 +339,7 @@ class Trainer_Distillation(object):
                                     for key in s_out_dict.keys()]
         distillation_loss = self.mse_coef * np.sum(distillation_loss_list)
 
-        if self.training_config["teacher_update"]:
+        if self.train_config["teacher_update"]:
             self.teacher_opt.zero_grad()
             self.student_opt.zero_grad()
 
@@ -351,7 +361,7 @@ class Trainer_Distillation(object):
         self.teacher_model.eval()
         self.student_model.eval()
         label_list, t_prob_list, s_prob_list = [], [], []
-        data_iter = self.data_loader.get_data(data_type, batch_size=self.training_config["batch_size"], epoch=1)
+        data_iter = self.data_loader.get_data(data_type, batch_size=self.batch_size, epoch=1)
         step = 0
         for inputs in data_iter:
             step += 1
